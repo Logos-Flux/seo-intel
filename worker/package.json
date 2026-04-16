@@ -1,0 +1,24 @@
+{
+  "name": "seo-intel-worker",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:migrate:local": "wrangler d1 execute seo-intel-db --local --file=migrations/0001_schema.sql",
+    "db:migrate:remote": "wrangler d1 execute seo-intel-db --remote --file=migrations/0001_schema.sql"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "agents": "^0.9.0",
+    "hono": "^4.7.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250327.0",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.14.0",
+    "vitest": "^3.1.0"
+  }
+}

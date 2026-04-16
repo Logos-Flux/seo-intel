@@ -1,0 +1,24 @@
+@media print {
+  body {
+    background: white !important;
+    color: #1a1a1a !important;
+    font-size: 11px;
+  }
+
+  .no-print { display: none !important; }
+
+  .bridge-card {
+    background: white !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: none !important;
+  }
+
+  .text-bridge-bright { color: #1a1a1a !important; }
+  .text-bridge-text { color: #333 !important; }
+  .text-bridge-muted { color: #666 !important; }
+  .text-eva-purple { color: #7B2FBE !important; }
+  .text-eva-green { color: #01a648 !important; }
+  .bg-bridge-deep { background: white !important; }
+
+  .report-section { page-break-inside: avoid; }
+}

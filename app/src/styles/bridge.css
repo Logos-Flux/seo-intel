@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+/* ============================================
+   BRIDGE — Command Center Theme
+   EVA-01 × NERV × Vision UI
+   ============================================ */
+
+/* --- Fonts --- */
+@font-face {
+  font-family: 'Departure Mono';
+  src: url('/fonts/DepartureMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM 3270';
+  src: url('/fonts/3270-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Theme Tokens --- */
+@theme {
+  /* Backgrounds */
+  --color-bridge-deep: #030c1d;
+  --color-bridge-surface: #0f1535;
+  --color-bridge-card: #1a1f3d;
+  --color-bridge-hover: #242a4a;
+
+  /* Text */
+  --color-bridge-text: #a0aec0;
+  --color-bridge-bright: #e0e6ed;
+  --color-bridge-muted: #5a6178;
+
+  /* EVA-01 Accents */
+  --color-eva-purple: #7B2FBE;
+  --color-eva-green: #01FF70;
+  --color-eva-purple-glow: #7B2FBE33;
+  --color-eva-green-glow: #01FF7022;
+
+  /* Semantic */
+  --color-bridge-info: #0075ff;
+  --color-bridge-success: #01b574;
+  --color-bridge-warning: #ffb547;
+  --color-bridge-error: #E31A1A;
+
+  /* Borders */
+  --color-bridge-border: #1e2548;
+  --color-bridge-border-active: #7B2FBE55;
+
+  /* Font families */
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-display: 'Departure Mono', 'JetBrains Mono', monospace;
+  --font-terminal: 'IBM 3270', 'JetBrains Mono', monospace;
+}
+
+/* --- Base Styles --- */
+html {
+  background-color: var(--color-bridge-deep);
+  color: var(--color-bridge-text);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* --- Typography Utility Classes --- */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-terminal {
+  font-family: var(--font-terminal);
+}
+
+/* --- Card Glass Effect (EVA cockpit panels) --- */
+.bridge-card {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 21, 53, 0.9) 0%,
+    rgba(26, 31, 61, 0.7) 100%
+  );
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-bridge-border);
+  border-radius: 8px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bridge-card:hover {
+  border-color: var(--color-bridge-border-active);
+  box-shadow: 0 0 20px var(--color-eva-purple-glow);
+}
+
+/* --- Glow Effects --- */
+.glow-purple {
+  box-shadow: 0 0 15px var(--color-eva-purple-glow),
+              0 0 30px rgba(123, 47, 190, 0.1);
+}
+
+.glow-green {
+  box-shadow: 0 0 15px var(--color-eva-green-glow),
+              0 0 30px rgba(1, 255, 112, 0.05);
+}
+
+.glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow-pulse {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+/* --- Circuit Trace Background Pattern --- */
+.circuit-bg {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 30h20m0 0v-10m0 10h10v10h10v-10m0 0h20' stroke='%231e2548' stroke-width='0.5' fill='none'/%3E%3Ccircle cx='20' cy='30' r='1.5' fill='%231e2548'/%3E%3Ccircle cx='40' cy='30' r='1.5' fill='%231e2548'/%3E%3C/svg%3E");
+  background-size: 60px 60px;
+}
+
+/* --- Status Indicators --- */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.live {
+  background: var(--color-eva-green);
+  box-shadow: 0 0 6px var(--color-eva-green);
+  animation: status-blink 1.5s ease-in-out infinite;
+}
+
+.status-dot.idle {
+  background: var(--color-bridge-warning);
+}
+
+.status-dot.error {
+  background: var(--color-bridge-error);
+  box-shadow: 0 0 6px var(--color-bridge-error);
+}
+
+.status-dot.offline {
+  background: var(--color-bridge-muted);
+}
+
+@keyframes status-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* --- React Flow Dark Theme --- */
+.react-flow__background {
+  background-color: var(--color-bridge-deep) !important;
+}
+
+.react-flow__edge-path {
+  stroke: var(--color-bridge-border) !important;
+  stroke-width: 1.5;
+}
+
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke: var(--color-eva-purple) !important;
+  stroke-dasharray: 8 4;
+  animation: flow-dash 0.6s linear infinite;
+}
+
+@keyframes flow-dash {
+  to { stroke-dashoffset: -24; }
+}
+
+.react-flow__controls {
+  background: var(--color-bridge-surface) !important;
+  border: 1px solid var(--color-bridge-border) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+.react-flow__controls-button {
+  background: var(--color-bridge-surface) !important;
+  border-color: var(--color-bridge-border) !important;
+  fill: var(--color-bridge-muted) !important;
+}
+
+.react-flow__controls-button:hover {
+  background: var(--color-bridge-hover) !important;
+  fill: var(--color-bridge-bright) !important;
+}
+
+.react-flow__minimap {
+  background: var(--color-bridge-surface) !important;
+  border: 1px solid var(--color-bridge-border) !important;
+  border-radius: 6px !important;
+}
+
+.react-flow__handle {
+  background: var(--color-bridge-border) !important;
+  border-color: var(--color-bridge-muted) !important;
+}
+
+/* --- Scrollbar (dark themed) --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bridge-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-bridge-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-eva-purple);
+}
