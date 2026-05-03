@@ -1,0 +1,82 @@
+const API_BASE = '/api/v1';
+
+async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_BASE}${path}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
+    ...options,
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as any).error ?? `API error ${res.status}`);
+  }
+
+  return res.json();
+}
+
+export const api = {
+  // Profiles
+  listProfiles: () => apiFetch<{ profiles: any[] }>('/profiles'),
+  getProfile: (id: string) => apiFetch<{ profile: any }>(`/profiles/${id}`),
+  createProfile: (data: { name: string; domain: string }) =>
+    apiFetch<{ profile: any }>('/profiles', { method: 'POST', body: JSON.stringify(data) }),
+  deleteProfile: (id: string) =>
+    apiFetch<{ deleted: boolean }>(`/profiles/${id}`, { method: 'DELETE' }),
+
+  // SEO Data
+  getKeywords: (profileId: string, cluster?: string) =>
+    apiFetch<{ keywords: any[]; clusters: any[] }>(`/profiles/${profileId}/keywords${cluster ? `?cluster=${cluster}` : ''}`),
+  getCompetitors: (profileId: string) =>
+    apiFetch<{ competitors: any[] }>(`/profiles/${profileId}/competitors`),
+  getGaps: (profileId: string, domain: string) =>
+    apiFetch<{ gaps: any[] }>(`/profiles/${profileId}/gaps/${domain}`),
+  getSerp: (profileId: string, keyword: string) =>
+    apiFetch<{ keyword: string; our_position: number | null; results: any[] }>(`/profiles/${profileId}/serp/${encodeURIComponent(keyword)}`),
+  getRanked: (profileId: string) =>
+    apiFetch<{ ranked: any[] }>(`/profiles/${profileId}/ranked`),
+  getBacklinks: (profileId: string) =>
+    apiFetch<{ own: any; competitors: any[] }>(`/profiles/${profileId}/backlinks`),
+  getLighthouse: (profileId: string) =>
+    apiFetch<{ lighthouse: any; audited_at: string | null }>(`/profiles/${profileId}/lighthouse`),
+  runLighthouse: (profileId: string) =>
+    apiFetch<{ lighthouse: any; audited_at: string }>(`/profiles/${profileId}/lighthouse`, { method: 'POST' }),
+  getTech: (profileId: string) =>
+    apiFetch<{ domain: string; technologies: any[] }>(`/profiles/${profileId}/tech`),
+  discoverCompetitors: (profileId: string) =>
+    apiFetch<{ competitors: { domain: string; reason: string; verified: boolean }[] }>(`/profiles/${profileId}/discover-competitors`, { method: 'POST' }),
+  saveCompetitors: (profileId: string, competitors: string[]) =>
+    apiFetch<{ saved: number }>(`/profiles/${profileId}/competitors`, { method: 'PUT', body: JSON.stringify({ competitors }) }),
+  enrichCompetitors: (profileId: string) =>
+    apiFetch<{ enriched: Record<string, string> }>(`/profiles/${profileId}/enrich-competitors`, { method: 'POST' }),
+  refresh: (profileId: string) =>
+    apiFetch<{ refreshed: Record<string, string> }>(`/profiles/${profileId}/refresh`, { method: 'POST' }),
+
+  // Clusters
+  createCluster: (profileId: string, seed: string, threshold?: number) =>
+    apiFetch<{ job_id: string }>(`/profiles/${profileId}/clusters`, {
+      method: 'POST', body: JSON.stringify({ seed, threshold }),
+    }),
+  listClusters: (profileId: string) =>
+    apiFetch<{ clusters: any[] }>(`/profiles/${profileId}/clusters`),
+  getCluster: (profileId: string, clusterId: string) =>
+    apiFetch<{ cluster: any; groups: any[] }>(`/profiles/${profileId}/clusters/${clusterId}`),
+  getClusterStatus: (profileId: string, clusterId: string) =>
+    apiFetch<{ status: string; error_message: string | null }>(`/profiles/${profileId}/clusters/${clusterId}/status`),
+  deleteCluster: (profileId: string, clusterId: string) =>
+    apiFetch<{ deleted: boolean }>(`/profiles/${profileId}/clusters/${clusterId}`, { method: 'DELETE' }),
+  getClusterExportUrl: (profileId: string, clusterId: string) =>
+    `${API_BASE}/profiles/${profileId}/clusters/${clusterId}/export.xlsx`,
+
+  // Intake
+  runIntake: (data: { domain: string; name: string; seed_keywords?: string[] }) =>
+    apiFetch<any>('/intake', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Reports
+  generateReport: (profileId: string) =>
+    apiFetch<{ report_id: string; token: string; url: string }>(`/profiles/${profileId}/report`, { method: 'POST' }),
+  getPublicReport: (token: string) =>
+    apiFetch<any>(`/reports/${token}`),
+};

@@ -1,0 +1,24 @@
+@media print {
+  body {
+    background: white !important;
+    color: #1a1a1a !important;
+    font-size: 11px;
+  }
+
+  .no-print { display: none !important; }
+
+  .t-card {
+    background: white !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: none !important;
+  }
+
+  .text-t-bright { color: #1a1a1a !important; }
+  .text-t-text { color: #333 !important; }
+  .text-t-muted { color: #666 !important; }
+  .text-t-accent { color: #7B2FBE !important; }
+  .text-t-accent-alt { color: #01a648 !important; }
+  .bg-t-deep { background: white !important; }
+
+  .report-section { page-break-inside: avoid; }
+}

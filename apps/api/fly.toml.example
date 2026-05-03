@@ -1,0 +1,46 @@
+# fly.toml — copy to fly.toml and edit `app` to your Fly app slug.
+# See https://fly.io/docs/reference/configuration/ for the schema.
+#
+# Two-process layout: `app` runs the HTTP server, `worker` runs the BullMQ
+# job processor. Both share the same image and env.
+
+app = "<your-api-app-name>"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3000"
+
+[processes]
+  app = "bun run start"
+  worker = "bun run start:worker"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "15s"
+    timeout = "5s"
+    grace_period = "5s"
+    method = "GET"
+    path = "/healthz"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
+  processes = ["app"]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
+  processes = ["worker"]

@@ -1,0 +1,39 @@
+{
+  "name": "seo-intel-api",
+  "version": "0.2.0",
+  "description": "SEO Intel API — Bun + Hono + Postgres + BullMQ wrapper around DataForSEO.",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "dev:worker": "bun run --watch src/workers/index.ts",
+    "start": "bun run dist/index.js",
+    "start:worker": "bun run dist/workers/index.js",
+    "build": "bun build src/index.ts --outdir ./dist --target bun && bun build src/workers/index.ts --outdir ./dist/workers --target bun",
+    "type-check": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "bullmq": "^5.34.0",
+    "drizzle-orm": "^0.36.0",
+    "exceljs": "^4.4.0",
+    "hono": "^4.7.0",
+    "ioredis": "^5.4.0",
+    "pg": "^8.13.0",
+    "zod": "^4.3.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/pg": "^8.11.0",
+    "drizzle-kit": "^0.28.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}

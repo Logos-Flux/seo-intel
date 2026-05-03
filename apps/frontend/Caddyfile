@@ -1,0 +1,32 @@
+# Caddy serves the built SPA and proxies /api/* to the seo-intel API.
+#
+# The upstream is read from the API_UPSTREAM env var so the same image
+# works in docker-compose (api:3000) and on Fly.io (https://<your-api>.fly.dev).
+#
+# Default upstream targets the docker-compose service name.
+{
+	debug
+}
+
+:8080 {
+	encode gzip
+
+	# Backend proxy — single origin, no CORS.
+	handle /api/* {
+		reverse_proxy {$API_UPSTREAM:http://api:3000} {
+			header_up Host {upstream_hostport}
+		}
+	}
+
+	# Static assets + SPA fallback.
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+
+		# Long-cache hashed assets, no-cache the index.
+		@hashed path_regexp \.(js|css|png|jpg|jpeg|svg|webp|woff2|ico)$
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+		header /index.html Cache-Control "no-cache"
+	}
+}

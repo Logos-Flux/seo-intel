@@ -1,0 +1,92 @@
+# One-shot local stack for seo-intel.
+#
+#   cd deploy && docker compose up --build
+#
+# Brings up:
+#   - postgres        (data on volume `pgdata`)
+#   - redis           (data on volume `redisdata`)
+#   - api             (Bun + Hono on :3000)
+#   - worker          (BullMQ processor — same image, different command)
+#   - frontend        (Caddy serving the built SPA on :8080, /api/* → api:3000)
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: seo
+      POSTGRES_PASSWORD: seo
+      POSTGRES_DB: seo
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U seo"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ../apps/api
+      dockerfile: Dockerfile
+    image: seo-intel-api:local
+    environment:
+      DATABASE_URL: postgres://seo:seo@postgres:5432/seo
+      REDIS_URL: redis://redis:6379
+      DATAFORSEO_LOGIN: ${DATAFORSEO_LOGIN:-}
+      DATAFORSEO_PASSWORD: ${DATAFORSEO_PASSWORD:-}
+      SEO_INTEL_API_KEY: ${SEO_INTEL_API_KEY:-local-dev-key}
+      NODE_ENV: production
+      PORT: "3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    image: seo-intel-api:local
+    command: ["bun", "run", "start:worker"]
+    environment:
+      DATABASE_URL: postgres://seo:seo@postgres:5432/seo
+      REDIS_URL: redis://redis:6379
+      DATAFORSEO_LOGIN: ${DATAFORSEO_LOGIN:-}
+      DATAFORSEO_PASSWORD: ${DATAFORSEO_PASSWORD:-}
+      SEO_INTEL_API_KEY: ${SEO_INTEL_API_KEY:-local-dev-key}
+      NODE_ENV: production
+    depends_on:
+      api:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ../apps/frontend
+      dockerfile: Dockerfile
+    image: seo-intel-frontend:local
+    environment:
+      API_UPSTREAM: http://api:3000
+    ports:
+      - "8080:8080"
+    depends_on:
+      api:
+        condition: service_started
+
+volumes:
+  pgdata:
+  redisdata:
